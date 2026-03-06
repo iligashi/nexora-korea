@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { SlidersHorizontal, Search, RotateCcw, X } from 'lucide-react';
+import { SlidersHorizontal, Search, RotateCcw, X, ChevronDown } from 'lucide-react';
 import type { FilterOptions, SortOption } from '@/lib/types';
 import clsx from 'clsx';
 
@@ -12,11 +12,11 @@ interface Props {
 }
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
-  { label: 'Newest first',      value: 'newest' },
-  { label: 'Price: Low → High', value: 'price_asc' },
-  { label: 'Price: High → Low', value: 'price_desc' },
-  { label: 'Year: Newest',      value: 'year_desc' },
-  { label: 'Mileage: Lowest',   value: 'mileage_asc' },
+  { label: 'Më të rejat',      value: 'newest' },
+  { label: 'Çmimi: Ulët në Lartë', value: 'price_asc' },
+  { label: 'Çmimi: Lartë në Ulët', value: 'price_desc' },
+  { label: 'Viti: Më i ri',      value: 'year_desc' },
+  { label: 'Kilometrazhi: Më i ulët',   value: 'mileage_asc' },
 ];
 
 export default function FilterBar({ filters, totalCars }: Props) {
@@ -37,7 +37,7 @@ export default function FilterBar({ filters, totalCars }: Props) {
     router.push(`${pathname}?${params.toString()}`);
   }, [searchParams, pathname, router]);
 
-  const hasFilters = ['brand', 'fuel', 'transmission', 'year_min', 'year_max', 'price_min', 'price_max', 'no_accident', 'search']
+  const hasFilters = ['brand', 'fuel', 'transmission', 'year_min', 'year_max', 'price_min', 'price_max', 'no_accident', 'search', 'mileage_max']
     .some((k) => searchParams.has(k));
 
   const clearAll = () => {
@@ -47,22 +47,25 @@ export default function FilterBar({ filters, totalCars }: Props) {
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const activeFilterCount = ['brand', 'fuel', 'transmission', 'year_min', 'year_max', 'price_min', 'price_max', 'no_accident', 'mileage_max']
+    .filter((k) => searchParams.has(k)).length;
+
   return (
-    <div className="bg-white border-b border-gray-100 sticky top-16 z-40">
+    <div className="bg-white border-b border-gray-100 sticky top-16 z-40 shadow-sm">
       <div className="container-main py-3">
         {/* Top bar */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Search */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="search"
-              placeholder="Search brand or model..."
+              placeholder="Kërko markën ose modelin..."
               defaultValue={get('search')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') push({ search: (e.target as HTMLInputElement).value });
               }}
-              className="input-field pl-9 pr-4 text-sm h-10"
+              className="input-field pl-10 pr-4 text-sm h-10"
             />
           </div>
 
@@ -70,7 +73,7 @@ export default function FilterBar({ filters, totalCars }: Props) {
           <select
             value={get('sort') || 'newest'}
             onChange={(e) => push({ sort: e.target.value })}
-            className="select-field w-auto h-10 text-sm"
+            className="select-field w-auto h-10 text-sm pr-8"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -81,34 +84,34 @@ export default function FilterBar({ filters, totalCars }: Props) {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={clsx(
-              'flex items-center gap-2 h-10 px-4 text-sm font-medium rounded-lg border transition-colors',
+              'flex items-center gap-2 h-10 px-4 text-sm font-medium rounded-xl border transition-all',
               showFilters || hasFilters
-                ? 'bg-brand-600 text-white border-brand-600'
-                : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
             )}
           >
             <SlidersHorizontal className="w-4 h-4" />
-            Filters
-            {hasFilters && (
-              <span className="w-5 h-5 bg-white text-brand-600 rounded-full text-xs font-bold flex items-center justify-center">
-                !
+            Filtrat
+            {activeFilterCount > 0 && (
+              <span className="w-5 h-5 bg-white text-brand-600 rounded-full text-[10px] font-bold flex items-center justify-center">
+                {activeFilterCount}
               </span>
             )}
           </button>
 
           {/* Result count */}
           <span className="text-sm text-gray-500 ml-auto hidden sm:block">
-            {totalCars.toLocaleString()} vehicles found
+            <span className="font-semibold text-gray-900">{totalCars.toLocaleString()}</span> automjete
           </span>
 
           {/* Clear */}
           {hasFilters && (
             <button
               onClick={clearAll}
-              className="flex items-center gap-1 text-sm text-red-500 hover:text-red-700 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Clear
+              Pastro
             </button>
           )}
         </div>
@@ -116,42 +119,41 @@ export default function FilterBar({ filters, totalCars }: Props) {
         {/* Expandable filter panel */}
         {showFilters && (
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-in pt-4 border-t border-gray-100">
-
             {/* Brand */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Brand</label>
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Marka</label>
               <select
                 value={get('brand')}
                 onChange={(e) => push({ brand: e.target.value })}
                 className="select-field text-sm"
               >
-                <option value="">All brands</option>
+                <option value="">Të gjitha markat</option>
                 {filters.brands.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
 
             {/* Fuel */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Fuel</label>
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Karburanti</label>
               <select
                 value={get('fuel')}
                 onChange={(e) => push({ fuel: e.target.value })}
                 className="select-field text-sm"
               >
-                <option value="">All fuels</option>
+                <option value="">Të gjitha</option>
                 {filters.fuel_types.map((f) => <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>)}
               </select>
             </div>
 
             {/* Transmission */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Gearbox</label>
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Kambio</label>
               <select
                 value={get('transmission')}
                 onChange={(e) => push({ transmission: e.target.value })}
                 className="select-field text-sm"
               >
-                <option value="">All</option>
+                <option value="">Të gjitha</option>
                 {filters.transmissions.map((t) => (
                   <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
                 ))}
@@ -160,7 +162,7 @@ export default function FilterBar({ filters, totalCars }: Props) {
 
             {/* Year range */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Year from</label>
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Viti nga</label>
               <input
                 type="number"
                 min={filters.year_range.min}
@@ -174,7 +176,7 @@ export default function FilterBar({ filters, totalCars }: Props) {
 
             {/* Price max */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Max price (EUR)</label>
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Çmimi max (EUR)</label>
               <input
                 type="number"
                 min={0}
@@ -188,15 +190,15 @@ export default function FilterBar({ filters, totalCars }: Props) {
 
             {/* No accident toggle */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Condition</label>
-              <label className="flex items-center gap-2 cursor-pointer h-10">
+              <label className="block text-[10px] font-bold text-gray-500 mb-1.5 uppercase tracking-widest">Gjendja</label>
+              <label className="flex items-center gap-2.5 cursor-pointer h-10">
                 <input
                   type="checkbox"
                   checked={get('no_accident') === '1'}
                   onChange={(e) => push({ no_accident: e.target.checked ? '1' : '' })}
                   className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
                 />
-                <span className="text-sm text-gray-700">No accident only</span>
+                <span className="text-sm text-gray-700">Vetëm pa aksident</span>
               </label>
             </div>
           </div>
@@ -212,19 +214,37 @@ export default function FilterBar({ filters, totalCars }: Props) {
                 <button
                   key={key}
                   onClick={() => push({ [key]: '' })}
-                  className="flex items-center gap-1.5 px-3 py-1 bg-brand-50 text-brand-700 text-xs font-medium rounded-full border border-brand-200 hover:bg-brand-100 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-700 text-xs font-medium rounded-lg border border-brand-100 hover:bg-brand-100 transition-colors"
                 >
-                  <span className="capitalize">{key}:</span> {val}
+                  <span className="capitalize text-brand-500">{key}:</span> {val}
                   <X className="w-3 h-3" />
                 </button>
               );
             })}
+            {get('year_min') && (
+              <button
+                onClick={() => push({ year_min: '' })}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-700 text-xs font-medium rounded-lg border border-brand-100 hover:bg-brand-100 transition-colors"
+              >
+                <span className="text-brand-500">From:</span> {get('year_min')}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {get('price_max') && (
+              <button
+                onClick={() => push({ price_max: '' })}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-700 text-xs font-medium rounded-lg border border-brand-100 hover:bg-brand-100 transition-colors"
+              >
+                <span className="text-brand-500">Max:</span> {Number(get('price_max')).toLocaleString()}
+                <X className="w-3 h-3" />
+              </button>
+            )}
             {get('no_accident') === '1' && (
               <button
                 onClick={() => push({ no_accident: '' })}
-                className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-200 hover:bg-green-100 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg border border-emerald-100 hover:bg-emerald-100 transition-colors"
               >
-                No accident <X className="w-3 h-3" />
+                Pa aksident <X className="w-3 h-3" />
               </button>
             )}
           </div>

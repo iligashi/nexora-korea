@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:koreaautoimports.com)",
+      "WebFetch(domain:fem.encar.com)",
+      "Bash(grep:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

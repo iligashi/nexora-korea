@@ -221,8 +221,9 @@ class FetchEncarCars implements ShouldQueue
         $brandName = $brand->display_name ?? null;
         $model     = ModelMapper::getEnglishModelName($carData['Model'] ?? '', $brandName);
 
-        // Engine size
+        // Engine size + options from vehicle details
         $engineSize = '0';
+        $detailOptions = [];
         if (!empty($carData['Id'])) {
             try {
                 $vehicleDetails = app(FetchEncarVehicleDetailsAction::class)->execute($carData['Id']);
@@ -231,6 +232,7 @@ class FetchEncarCars implements ShouldQueue
                         ?? $vehicleDetails['raw_data']['raw_data']['displacement']
                         ?? $vehicleDetails['vehicle']['displacement']
                         ?? '0';
+                    $detailOptions = $vehicleDetails['options'] ?? [];
                 }
             } catch (\Exception $e) {
                 Log::warning('Failed to get engine size', ['car_id' => $carData['Id'], 'error' => $e->getMessage()]);
@@ -272,7 +274,7 @@ class FetchEncarCars implements ShouldQueue
                 'has_simple_repair'   => $hasSimpleRepair,
                 'is_registered'       => true,
                 'external_inspection' => $this->mapExternalInspection($carData),
-                'internal_inspection' => $this->mapInternalInspection($carData),
+                'internal_inspection' => $this->mapInternalInspection($carData, $detailOptions),
                 'diagnostic_data'     => $diagnosticData,
                 'inners'              => $innersData,
             ]
@@ -345,12 +347,25 @@ class FetchEncarCars implements ShouldQueue
         return $result;
     }
 
-    private function mapInternalInspection(array $carData): array
+    private function mapInternalInspection(array $carData, array $detailOptions = []): array
     {
         $result = [];
+        $options = [];
+
+        // Options from Encar listing API
         if (!empty($carData['Options'])) {
-            $result['options'] = $carData['Options'];
+            $options = array_merge($options, $carData['Options']);
         }
+
+        // Options from vehicle detail API (Korean names from option codes)
+        if (!empty($detailOptions)) {
+            $options = array_merge($options, $detailOptions);
+        }
+
+        if (!empty($options)) {
+            $result['options'] = array_values(array_unique($options));
+        }
+
         return $result;
     }
 

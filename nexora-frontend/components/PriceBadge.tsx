@@ -12,7 +12,7 @@ export default function PriceBadge({ eur, krw, size = 'sm', showKrw = false }: P
 
   if (!isAvailable) {
     return (
-      <span className="text-sm font-medium text-gray-500 italic">Price on request</span>
+      <span className="text-sm font-medium text-gray-500 italic">Çmimi sipas kërkesës</span>
     );
   }
 

@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Services\EncarOptionMapper;
 use Illuminate\Support\Facades\Log;
 
 class FetchEncarVehicleDetailsAction
@@ -24,9 +25,24 @@ class FetchEncarVehicleDetailsAction
                 return $details;
             }
 
+            // Extract options from vehicle data
+            $optionCodes = [];
+            if (!empty($vehicleData['options']['standard'])) {
+                $optionCodes = array_merge($optionCodes, $vehicleData['options']['standard']);
+            }
+            if (!empty($vehicleData['options']['choice'])) {
+                $optionCodes = array_merge($optionCodes, $vehicleData['options']['choice']);
+            }
+            if (!empty($vehicleData['options']['etc'])) {
+                $optionCodes = array_merge($optionCodes, $vehicleData['options']['etc']);
+            }
+
+            $optionNames = EncarOptionMapper::codesToNames($optionCodes);
+
             return [
                 'success'  => true,
                 'raw_data' => $details,
+                'options'  => $optionNames,
                 'vehicle'  => [
                     'displacement' => $details['attribute']['displacement'] ?? null,
                     'vin'          => $details['attribute']['vin'] ?? null,

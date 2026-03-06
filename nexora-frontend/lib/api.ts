@@ -21,7 +21,7 @@ function buildUrl(path: string, params?: Record<string, string | number | boolea
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
-    next: { revalidate: 300 }, // ISR: revalidate every 5 minutes
+    next: { revalidate: 300 },
     ...options,
   });
 
@@ -32,35 +32,23 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/**
- * Fetch paginated car listings with optional filters.
- */
 export async function getCars(filters: CarFilters = {}): Promise<CarsResponse> {
   const url = buildUrl('/cars', filters as Record<string, string | number | boolean | undefined>);
   return apiFetch<CarsResponse>(url);
 }
 
-/**
- * Fetch a single car by ID (full detail).
- */
 export async function getCar(id: number): Promise<CarDetailResponse> {
   return apiFetch<CarDetailResponse>(buildUrl(`/cars/${id}`), {
     next: { revalidate: 600 },
   });
 }
 
-/**
- * Fetch all active brands.
- */
 export async function getBrands(): Promise<BrandsResponse> {
   return apiFetch<BrandsResponse>(buildUrl('/brands'), {
     next: { revalidate: 3600 },
   });
 }
 
-/**
- * Trigger a manual Encar import (server-side only, protected by secret).
- */
 export async function triggerFetch(brand?: string): Promise<{ message: string }> {
   const res = await fetch(`${API_BASE}/fetch`, {
     method: 'POST',
@@ -81,8 +69,8 @@ export async function triggerFetch(brand?: string): Promise<{ message: string }>
 // ─── Formatters ─────────────────────────────────────────────────────────────
 
 export function formatPrice(eur: number | null, krw: number | null = null): string {
-  if (eur === null) return 'Price on request';
-  const eurStr = new Intl.NumberFormat('en-EU', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(eur);
+  if (eur === null) return 'Cmimi sipas k\u00ebrkeses';
+  const eurStr = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(eur);
   if (krw !== null) {
     const krwStr = new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW', maximumFractionDigits: 0 }).format(krw);
     return `${eurStr} (${krwStr})`;
@@ -96,20 +84,20 @@ export function formatMileage(km: number | null): string {
 }
 
 export const FUEL_LABELS: Record<string, string> = {
-  gasoline: 'Gasoline',
-  diesel:   'Diesel',
-  electric: 'Electric',
-  hybrid:   'Hybrid',
+  gasoline: 'Benzin\u00eb',
+  diesel:   'Naft\u00eb',
+  electric: 'Elektrike',
+  hybrid:   'Hibride',
   lpg:      'LPG',
-  other:    'Other',
+  other:    'Tjet\u00ebr',
 };
 
 export const TRANSMISSION_LABELS: Record<string, string> = {
-  automatic:      'Automatic',
-  manual:         'Manual',
-  'semi-automatic': 'Semi-Auto',
-  cvt:            'CVT',
-  other:          'Other',
+  automatic:        'Automatike',
+  manual:           'Manuale',
+  'semi-automatic': 'Gjysm\u00eb-Auto',
+  cvt:              'CVT',
+  other:            'Tjet\u00ebr',
 };
 
 export const FUEL_COLORS: Record<string, string> = {

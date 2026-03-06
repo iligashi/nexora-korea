@@ -36,15 +36,33 @@ export interface InternalInspection {
   options?: string[];
 }
 
+// Real API format: { code, name, result, resultCode }
 export interface DiagnosticItem {
-  category: string;
+  code?: string;
   name: string;
-  status: string;
+  result?: string;
+  resultCode?: string;
+  // Legacy format support
+  category?: string;
+  status?: string;
   value?: string;
 }
 
-export interface InnerInspection {
-  [key: string]: unknown;
+// Inners can be the nested Encar format or a simple array/object
+export type InnerInspection = InnerGroup[] | Record<string, unknown>;
+
+export interface InnerGroup {
+  type: { code: string; title: string };
+  price?: number | null;
+  children: InnerItem[];
+}
+
+export interface InnerItem {
+  type: { code: string; title: string };
+  statusType?: { code: string; title: string };
+  statusItemTypes?: { code: string; title: string }[];
+  description?: string | null;
+  children?: InnerItem[];
 }
 
 export type FuelType = 'gasoline' | 'diesel' | 'electric' | 'hybrid' | 'lpg' | 'other';

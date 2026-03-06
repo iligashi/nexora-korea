@@ -18,46 +18,46 @@ export default function SpecGrid({ car }: Props) {
   const specs: SpecItem[] = [
     {
       icon: <Calendar className="w-5 h-5" />,
-      label: 'Year',
+      label: 'Viti',
       value: String(car.year),
     },
     {
       icon: <Gauge className="w-5 h-5" />,
-      label: 'Mileage',
+      label: 'Kilometrazhi',
       value: car.mileage_label,
     },
     {
       icon: <Fuel className="w-5 h-5" />,
-      label: 'Fuel Type',
+      label: 'Lloji i Karburantit',
       value: FUEL_LABELS[car.fuel_type ?? 'other'] ?? car.fuel_type ?? 'N/A',
     },
     {
       icon: <Settings2 className="w-5 h-5" />,
-      label: 'Transmission',
+      label: 'Transmisioni',
       value: TRANSMISSION_LABELS[car.transmission ?? 'other'] ?? car.transmission ?? 'N/A',
     },
     {
       icon: <Zap className="w-5 h-5" />,
-      label: 'Engine',
+      label: 'Motori',
       value: car.engine_label,
     },
     {
       icon: car.has_accident
         ? <ShieldAlert className="w-5 h-5" />
         : <ShieldCheck className="w-5 h-5" />,
-      label: 'Accident History',
-      value: car.has_accident ? 'Accident reported' : 'No accident',
+      label: 'Historiku i Aksidenteve',
+      value: car.has_accident ? 'Aksident i raportuar' : 'Pa aksident',
       highlight: car.has_accident ? 'red' : 'green',
     },
     {
       icon: <ShieldCheck className="w-5 h-5" />,
-      label: 'Simple Repair',
-      value: car.has_simple_repair ? 'Minor repair recorded' : 'None',
+      label: 'Riparim i Thjeshtë',
+      value: car.has_simple_repair ? 'Riparim i vogël i regjistruar' : 'Asnjë',
       highlight: car.has_simple_repair ? 'red' : 'green',
     },
     {
       icon: <Hash className="w-5 h-5" />,
-      label: 'Encar ID',
+      label: 'ID Encar',
       value: car.source_url
         ? car.source_url.split('carid=')[1] ?? 'N/A'
         : 'N/A',
@@ -70,15 +70,15 @@ export default function SpecGrid({ car }: Props) {
         <div
           key={label}
           className={clsx(
-            'flex flex-col gap-1.5 p-4 rounded-xl border',
-            highlight === 'green' && 'bg-green-50 border-green-100',
-            highlight === 'red'   && 'bg-red-50 border-red-100',
-            !highlight            && 'bg-gray-50 border-gray-100'
+            'flex flex-col gap-2 p-4 rounded-xl border transition-all hover:shadow-sm',
+            highlight === 'green' && 'bg-emerald-50/80 border-emerald-100',
+            highlight === 'red'   && 'bg-red-50/80 border-red-100',
+            !highlight            && 'bg-gray-50/80 border-gray-100'
           )}
         >
           <span className={clsx(
-            'flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide',
-            highlight === 'green' && 'text-green-600',
+            'flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest',
+            highlight === 'green' && 'text-emerald-600',
             highlight === 'red'   && 'text-red-600',
             !highlight            && 'text-gray-400'
           )}>
@@ -87,7 +87,7 @@ export default function SpecGrid({ car }: Props) {
           </span>
           <span className={clsx(
             'text-sm font-bold',
-            highlight === 'green' && 'text-green-800',
+            highlight === 'green' && 'text-emerald-800',
             highlight === 'red'   && 'text-red-800',
             !highlight            && 'text-gray-900'
           )}>
