@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php:*)",
+      "Bash(/c/xampp/php/php:*)",
+      "Bash(node:*)",
+      "Read(//c/xampp//**)",
+      "Read(//c/ProgramData/chocolatey/bin//**)",
+      "Read(//c/ProgramData/**)",
+      "Read(//c/Users/IlazG/AppData/Local/**)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(cmd:*)",
+      "Bash(cp:*)",
+      "Bash(/c/xampp/mysql/bin/mysql:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
